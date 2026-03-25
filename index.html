@@ -3,21 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ตัดสินใจเลย! (Decision Maker)</title>
+<title>ตัดสินใจเลย! (Decision Maker PRO)</title>
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-dark: #0f172a;
-    --card-bg: #1e293b;
-    --card-hover: #334155;
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
+    --card-bg: rgba(30, 41, 59, 0.6);
+    --card-hover: rgba(51, 65, 85, 0.8);
+    --primary: #8b5cf6;
+    --primary-hover: #7c3aed;
     --secondary: #ec4899;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --danger: #ef4444;
-    --border: #334155;
-    --glow: 0 0 20px rgba(99, 102, 241, 0.4);
+    --border: rgba(255, 255, 255, 0.1);
+    --glow: 0 0 20px rgba(139, 92, 246, 0.4);
+    --glass-blur: blur(12px);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,23 +30,35 @@
     min-height: 100vh;
     overflow-x: hidden;
     background-image: 
-      radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
+      radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
       radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
+    display: flex;
+    justify-content: center;
   }
 
-  .container {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 60px 20px 100px;
+  .app-wrapper {
+    display: flex;
+    gap: 24px;
+    max-width: 1100px;
+    width: 100%;
+    padding: 40px 20px 120px;
+    flex-wrap: wrap;
+  }
+
+  .main-content { flex: 1; min-width: 320px; max-width: 700px; }
+  .sidebar { width: 320px; flex-shrink: 0; }
+
+  @media (max-width: 860px) {
+    .sidebar { width: 100%; }
   }
 
   /* Header */
   header { text-align: center; margin-bottom: 40px; }
   header h1 {
-    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
     font-weight: 700;
     line-height: 1.1;
-    background: linear-gradient(to right, var(--primary), var(--secondary));
+    background: linear-gradient(to right, #a78bfa, #f472b6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 12px;
@@ -56,38 +69,36 @@
   .input-group {
     display: flex;
     gap: 12px;
-    margin-bottom: 40px;
-    position: relative;
+    margin-bottom: 30px;
   }
   .input-group input {
     flex: 1;
     background: var(--card-bg);
-    border: 2px solid var(--border);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border);
     color: var(--text-main);
     font-family: 'Prompt', sans-serif;
     font-size: 1.1rem;
     padding: 16px 24px;
-    border-radius: 16px;
+    border-radius: 20px;
     outline: none;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   }
   .input-group input:focus { border-color: var(--primary); box-shadow: var(--glow); }
   .btn-add {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
     border: none;
     width: 60px;
-    border-radius: 16px;
+    border-radius: 20px;
     font-size: 1.5rem;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
   }
-  .btn-add:hover { background: var(--primary-hover); transform: translateY(-2px); }
+  .btn-add:hover { transform: translateY(-2px); box-shadow: var(--glow); }
   .btn-add:active { transform: translateY(0); }
 
   /* List Header */
@@ -95,286 +106,191 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    padding: 0 8px;
   }
-  .list-header h2 { font-size: 1.2rem; font-weight: 500; display: flex; align-items: center; gap: 8px; }
-  .badge {
-    background: var(--border);
-    padding: 2px 10px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-  }
-  .btn-clear {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-  }
-  .btn-clear:hover { color: var(--danger); text-decoration: underline; }
+  .list-header h2 { font-size: 1.1rem; font-weight: 500; display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+  .badge { background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 20px; font-size: 0.9rem; color: white; }
 
-  /* List & Cards */
-  .choices-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+  /* Choices List */
+  .choices-list { display: flex; flex-direction: column; gap: 12px; }
   
   .choice-card {
     background: var(--card-bg);
-    border: 2px solid var(--border);
-    border-radius: 16px;
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border);
+    border-radius: 20px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     overflow: hidden;
   }
-  .choice-card:hover { border-color: #475569; transform: translateY(-2px); }
-  
-  .choice-card.selected {
-    border-color: var(--primary);
-    background: rgba(99, 102, 241, 0.05);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  }
-  
-  /* Roulette Highlight Class */
-  .choice-card.spinning {
-    border-color: var(--secondary);
-    background: rgba(236, 72, 153, 0.1);
-    transform: scale(1.02);
-  }
+  .choice-card:hover { background: var(--card-hover); border-color: rgba(255,255,255,0.2); transform: translateX(4px); }
+  .choice-card.selected { border-color: var(--primary); box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); background: rgba(139, 92, 246, 0.1); }
+  .choice-card.spinning { border-color: var(--secondary); background: rgba(236, 72, 153, 0.1); transform: scale(1.02); }
 
-  .card-main {
-    display: flex;
-    align-items: center;
-    padding: 16px 20px;
-    gap: 16px;
-  }
+  .card-main { display: flex; align-items: center; padding: 16px 20px; gap: 16px; }
+  
   .radio-circle {
-    width: 24px;
-    height: 24px;
+    width: 22px; height: 22px;
     border: 2px solid var(--text-muted);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
   }
   .radio-inner {
-    width: 12px;
-    height: 12px;
+    width: 10px; height: 10px;
     background: var(--primary);
-    border-radius: 50%;
-    transform: scale(0);
+    border-radius: 50%; transform: scale(0);
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .choice-card.selected .radio-circle { border-color: var(--primary); }
   .choice-card.selected .radio-inner { transform: scale(1); }
 
-  .choice-title { flex: 1; font-size: 1.1rem; font-weight: 500; word-break: break-word; }
+  .choice-title { flex: 1; font-size: 1.1rem; font-weight: 500; display: flex; flex-direction: column; gap: 4px; }
+  .choice-meta { display: flex; gap: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 300; }
+  .meta-tag { background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 12px; }
   
-  .card-actions { display: flex; gap: 8px; }
+  .card-actions { display: flex; gap: 6px; }
   .btn-icon {
-    background: rgba(255,255,255,0.05);
-    border: none;
-    color: var(--text-muted);
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+    background: rgba(255,255,255,0.05); border: none; color: var(--text-muted);
+    width: 32px; height: 32px; border-radius: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
   }
   .btn-icon:hover { background: rgba(255,255,255,0.1); color: white; }
-  .btn-icon.danger:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+  .btn-icon.danger:hover { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
   
-  /* Detail Section */
-  .card-detail {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out;
+  /* Details Section */
+  .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; }
+  .card-detail.open { max-height: 200px; }
+  .detail-inner { padding: 0 20px 16px 58px; display: flex; flex-direction: column; gap: 10px; }
+  .detail-inputs { display: flex; gap: 10px; }
+  .detail-inputs input {
+    background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white;
+    padding: 8px 12px; border-radius: 8px; font-family: inherit; font-size: 0.9rem; outline: none;
   }
-  .card-detail.open { max-height: 150px; }
+  .input-tags { flex: 2; }
+  .input-weight { flex: 1; }
   .card-detail textarea {
-    width: 100%;
-    background: rgba(0,0,0,0.2);
-    border: none;
-    border-top: 1px solid var(--border);
-    color: var(--text-main);
-    font-family: 'Prompt', sans-serif;
-    padding: 16px 20px;
-    resize: none;
-    height: 100px;
-    outline: none;
+    width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+    color: var(--text-main); font-family: inherit; padding: 12px; border-radius: 8px;
+    resize: none; height: 60px; outline: none; font-size: 0.9rem;
   }
-  .card-detail textarea::placeholder { color: #64748b; }
 
   /* Empty State */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    background: rgba(255,255,255,0.02);
-    border: 2px dashed var(--border);
-    border-radius: 16px;
-    color: var(--text-muted);
+  .empty-state { text-align: center; padding: 60px 20px; background: rgba(255,255,255,0.02); border: 2px dashed var(--border); border-radius: 20px; color: var(--text-muted); }
+
+  /* Sidebar */
+  .panel {
+    background: var(--card-bg); backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border); border-radius: 20px; padding: 20px;
+    margin-bottom: 20px;
   }
-  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+  .panel h3 { font-size: 1rem; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  
+  .history-list { display: flex; flex-direction: column; gap: 12px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
+  .history-list::-webkit-scrollbar { width: 4px; }
+  .history-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+  
+  .history-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px; background: rgba(0,0,0,0.2); border-radius: 12px; font-size: 0.9rem;
+  }
+  .history-info { display: flex; flex-direction: column; }
+  .history-title { font-weight: 500; color: #e2e8f0; }
+  .history-date { font-size: 0.75rem; color: var(--text-muted); }
+  .btn-clear-history { width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-muted); border-radius: 10px; margin-top: 12px; cursor: pointer; font-family: inherit; }
+  .btn-clear-history:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
 
   /* Bottom Actions */
   .action-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid var(--border);
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    z-index: 50;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border); padding: 20px; z-index: 50; display: flex; justify-content: center;
   }
-  .action-bar .container-inner {
-    max-width: 680px;
-    width: 100%;
-    display: flex;
-    gap: 16px;
-  }
+  .action-inner { display: flex; gap: 12px; max-width: 1100px; width: 100%; flex-wrap: wrap; }
   .btn-main {
-    flex: 1;
-    padding: 16px 24px;
-    border-radius: 16px;
-    font-family: inherit;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    flex: 1; min-width: 150px; padding: 16px 20px; border-radius: 16px; font-family: inherit; font-size: 1rem;
+    font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
-  .btn-random {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
-    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
-  }
-  .btn-random:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4); }
+  .btn-slot { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2); }
+  .btn-slot:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4); }
   
-  .btn-confirm {
-    background: white;
-    color: var(--bg-dark);
-  }
-  .btn-confirm:hover { transform: translateY(-2px); background: #f8fafc; }
-  .btn-confirm:disabled {
-    background: var(--border);
-    color: var(--text-muted);
-    cursor: not-allowed;
-    transform: none;
-  }
+  .btn-weight { background: rgba(255,255,255,0.1); color: white; border-color: var(--border); }
+  .btn-weight:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+
+  .btn-confirm { background: white; color: var(--bg-dark); }
+  .btn-confirm:hover { background: #f8fafc; transform: translateY(-2px); }
+  .btn-confirm:disabled { background: rgba(255,255,255,0.1); color: var(--text-muted); cursor: not-allowed; transform: none; }
+  
+  .btn-clear-all { background: transparent; color: var(--text-muted); border-color: var(--border); flex-grow: 0; min-width: auto; padding: 16px; }
+  .btn-clear-all:hover { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
 
   /* Modal */
   .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(8px);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    z-index: 100; display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
   }
   .modal-overlay.show { opacity: 1; pointer-events: auto; }
-  
   .modal {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 40px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    transform: scale(0.95) translateY(20px);
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(20px); border: 1px solid var(--border);
+    border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; text-align: center;
+    transform: scale(0.95) translateY(20px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
   }
   .modal-overlay.show .modal { transform: scale(1) translateY(0); }
-  
-  .modal-icon {
-    font-size: 4rem;
-    margin-bottom: 20px;
-    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-    animation-delay: 0.2s;
-  }
-  @keyframes popIn {
-    0% { transform: scale(0); }
-    100% { transform: scale(1); }
-  }
-  
+  .modal-icon { font-size: 4rem; margin-bottom: 20px; }
   .modal h3 { color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
-  .modal h2 { font-size: 2rem; color: white; margin-bottom: 16px; word-break: break-word; }
-  .modal p { background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; margin-bottom: 24px; color: var(--text-muted); text-align: left;}
-  
-  .modal-btn {
-    width: 100%;
-    padding: 16px;
-    border-radius: 12px;
-    font-family: inherit;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    background: var(--primary);
-    color: white;
-    transition: background 0.2s;
-  }
-  .modal-btn:hover { background: var(--primary-hover); }
-
+  .modal h2 { font-size: 2rem; color: white; margin-bottom: 24px; }
+  .modal-btn { width: 100%; padding: 16px; border-radius: 12px; font-family: inherit; font-size: 1.1rem; font-weight: 600; cursor: pointer; border: none; background: var(--primary); color: white; }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <header>
-    <h1>ตัดสินใจเลย!</h1>
-    <p>โยนความลังเลทิ้งไป เพิ่มตัวเลือก แล้วให้เราช่วยตัดสินใจ</p>
-  </header>
+<div class="app-wrapper">
+  
+  <div class="main-content">
+    <header>
+      <h1>ตัดสินใจเลย!</h1>
+      <p>โยนความลังเลทิ้งไป... เราช่วยคุณเลือก!</p>
+    </header>
 
-  <div class="input-group">
-    <input type="text" id="choiceInput" placeholder="พิมพ์ตัวเลือกที่นี่ เช่น ชาบู, หมูกระทะ..." maxlength="100" autocomplete="off">
-    <button class="btn-add" id="addBtn" title="เพิ่มตัวเลือก">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    </button>
-  </div>
+    <div class="input-group">
+      <input type="text" id="choiceInput" placeholder="พิมพ์ตัวเลือกที่นี่ เช่น ชาบู, สุกี้..." maxlength="100" autocomplete="off">
+      <button class="btn-add" id="addBtn" title="เพิ่มตัวเลือก">+</button>
+    </div>
 
-  <div class="list-header">
-    <h2>ตัวเลือกของคุณ <span class="badge" id="countBadge">0</span></h2>
-    <button class="btn-clear" id="clearBtn">ล้างทั้งหมด</button>
-  </div>
+    <div class="list-header">
+      <h2>ตัวเลือกทั้งหมด <span class="badge" id="countBadge">0</span></h2>
+      <span style="font-size: 0.9rem; color: var(--text-muted);">น้ำหนักรวม: <span id="weightBadge">0</span></span>
+    </div>
 
-  <div class="choices-list" id="choicesList">
-    <div class="empty-state" id="emptyState">
-      <div class="icon">🤔</div>
-      <p>ยังไม่มีตัวเลือก ลองเพิ่มอะไรสักอย่างสิ</p>
+    <div class="choices-list" id="choicesList">
+      <div class="empty-state" id="emptyState">
+        <div class="icon">🤔</div>
+        <p>ยังไม่มีตัวเลือก ลองเพิ่มอะไรสักอย่างสิ</p>
+      </div>
     </div>
   </div>
+
+  <aside class="sidebar">
+    <div class="panel">
+      <h3>📊 ประวัติการตัดสินใจ</h3>
+      <div class="history-list" id="historyList">
+        </div>
+      <button class="btn-clear-history" id="clearHistoryBtn">ล้างประวัติทั้งหมด</button>
+    </div>
+  </aside>
+
 </div>
 
 <div class="action-bar">
-  <div class="container-inner">
-    <button class="btn-main btn-random" id="randomBtn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21l5.67-5.67"/></svg>
-      สุ่มเลือกให้หน่อย!
-    </button>
-    <button class="btn-main btn-confirm" id="confirmBtn" disabled>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      ตกลงเอาอันนี้
-    </button>
+  <div class="action-inner">
+    <button class="btn-main btn-slot" id="randomBtn">🎰 สุ่มแบบปกติ</button>
+    <button class="btn-main btn-weight" id="randomWeightBtn">⚖️ สุ่มตามน้ำหนัก</button>
+    <button class="btn-main btn-confirm" id="confirmBtn" disabled>✔️ ยืนยันตัวเลือกนี้</button>
+    <button class="btn-main btn-clear-all" id="clearBtn" title="ล้างทั้งหมด">✕</button>
   </div>
 </div>
 
@@ -383,16 +299,18 @@
     <div class="modal-icon" id="modalIcon">🎉</div>
     <h3 id="modalSubtitle">ผลการตัดสินใจ</h3>
     <h2 id="modalTitle">ชาบู</h2>
-    <p id="modalDetail" style="display: none;"></p>
     <button class="modal-btn" id="closeModalBtn">เยี่ยมไปเลย!</button>
   </div>
 </div>
 
 <script>
-  let choices = [
-    { id: '1', title: 'กินชาบูร้านเปิดใหม่', detail: 'โปรโมชันมา 4 จ่าย 3 หมดเขตสิ้นเดือนนี้' },
-    { id: '2', title: 'สั่งพิซซ่ามากินบ้าน', detail: 'ขี้เกียจออกไปข้างนอก มีโค้ดลดในแอป' }
+  // Initialize from Local Storage or default
+  let choices = JSON.parse(localStorage.getItem('dm_choices')) || [
+    { id: '1', title: 'กินชาบูร้านเปิดใหม่', detail: '', tags: 'มื้อเย็น, อร่อย', weight: 8, showDetail: false },
+    { id: '2', title: 'สั่งพิซซ่า', detail: '', tags: 'ด่วน', weight: 3, showDetail: false }
   ];
+  let decisionHistory = JSON.parse(localStorage.getItem('dm_history')) || [];
+  
   let selectedId = null;
   let isSpinning = false;
 
@@ -402,170 +320,214 @@
     list: document.getElementById('choicesList'),
     emptyState: document.getElementById('emptyState'),
     countBadge: document.getElementById('countBadge'),
+    weightBadge: document.getElementById('weightBadge'),
     randomBtn: document.getElementById('randomBtn'),
+    randomWeightBtn: document.getElementById('randomWeightBtn'),
     confirmBtn: document.getElementById('confirmBtn'),
     clearBtn: document.getElementById('clearBtn'),
+    historyList: document.getElementById('historyList'),
+    clearHistoryBtn: document.getElementById('clearHistoryBtn'),
     modal: document.getElementById('modalOverlay'),
     modalTitle: document.getElementById('modalTitle'),
-    modalDetail: document.getElementById('modalDetail'),
     modalIcon: document.getElementById('modalIcon'),
     modalSubtitle: document.getElementById('modalSubtitle'),
     closeModalBtn: document.getElementById('closeModalBtn'),
   };
 
-  function generateId() {
-    return Math.random().toString(36).substr(2, 9);
+  function saveData() {
+    localStorage.setItem('dm_choices', JSON.stringify(choices));
+    localStorage.setItem('dm_history', JSON.stringify(decisionHistory));
   }
 
-  function escapeHtml(unsafe) {
-    return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  function generateId() { return Math.random().toString(36).substr(2, 9); }
+  function escapeHtml(str) { return String(str).replace(/[&<>'"]/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[match])); }
+
+  function renderHistory() {
+    elements.historyList.innerHTML = '';
+    if (decisionHistory.length === 0) {
+      elements.historyList.innerHTML = '<div style="text-align:center; padding: 20px; color: #64748b; font-size: 0.9rem;">ยังไม่มีประวัติ</div>';
+      return;
+    }
+    
+    // เรียงจากใหม่ไปเก่า
+    [...decisionHistory].reverse().forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      div.innerHTML = `
+        <div class="history-info">
+          <span class="history-title">🎯 ${escapeHtml(item.title)}</span>
+          <span class="history-date">${item.date}</span>
+        </div>
+      `;
+      elements.historyList.appendChild(div);
+    });
   }
 
   function render() {
-    // ลบการ์ดเก่าออก (เก็บ emptyState ไว้)
     const cards = elements.list.querySelectorAll('.choice-card');
     cards.forEach(card => card.remove());
 
+    let totalWeight = 0;
     elements.countBadge.textContent = choices.length;
     elements.emptyState.style.display = choices.length === 0 ? 'block' : 'none';
     elements.confirmBtn.disabled = !selectedId || choices.length === 0;
 
     choices.forEach((choice) => {
+      totalWeight += Number(choice.weight) || 1;
       const card = document.createElement('div');
       card.className = `choice-card ${choice.id === selectedId ? 'selected' : ''}`;
       card.id = `card-${choice.id}`;
+      
+      // จัดการ Tags
+      let tagsHtml = '';
+      if(choice.tags && choice.tags.trim() !== '') {
+        const tagsArray = choice.tags.split(',').map(t => t.trim()).filter(t => t);
+        tagsHtml = tagsArray.map(t => `<span class="meta-tag">🏷️ ${escapeHtml(t)}</span>`).join('');
+      }
+
       card.innerHTML = `
         <div class="card-main">
           <div class="radio-circle"><div class="radio-inner"></div></div>
-          <div class="choice-title">${escapeHtml(choice.title)}</div>
+          <div class="choice-title">
+            <span>${escapeHtml(choice.title)}</span>
+            <div class="choice-meta">
+              ${tagsHtml}
+              <span class="meta-tag">⚖️ น้ำหนัก: ${choice.weight || 1}</span>
+            </div>
+          </div>
           <div class="card-actions">
-            <button class="btn-icon btn-expand" title="รายละเอียด">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </button>
-            <button class="btn-icon danger btn-delete" title="ลบ">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
+            <button class="btn-icon btn-expand" title="ตั้งค่า/รายละเอียด">✏️</button>
+            <button class="btn-icon danger btn-delete" title="ลบ">🗑️</button>
           </div>
         </div>
         <div class="card-detail ${choice.showDetail ? 'open' : ''}">
-          <textarea placeholder="เพิ่มรายละเอียด เช่น ราคา, ข้อดี/ข้อเสีย...">${escapeHtml(choice.detail || '')}</textarea>
+          <div class="detail-inner">
+            <div class="detail-inputs">
+              <input type="text" class="input-tags" placeholder="แท็ก (เช่น ด่วน, มื้อเย็น คั่นด้วยลูกน้ำ)" value="${escapeHtml(choice.tags || '')}">
+              <input type="number" class="input-weight" placeholder="น้ำหนัก 1-100" min="1" value="${choice.weight || 1}">
+            </div>
+            <textarea placeholder="เพิ่มรายละเอียดอื่นๆ...">${escapeHtml(choice.detail || '')}</textarea>
+          </div>
         </div>
       `;
 
-      // Event Listeners สำหรับแต่ละการ์ด
+      // Events
       card.querySelector('.card-main').addEventListener('click', (e) => {
-        if(e.target.closest('.card-actions')) return; // ไม่เลือกถ้ากดปุ่ม
+        if(e.target.closest('.card-actions')) return;
         selectedId = choice.id;
         render();
       });
 
       card.querySelector('.btn-expand').addEventListener('click', () => {
         choice.showDetail = !choice.showDetail;
-        render();
+        render(); saveData();
       });
 
       card.querySelector('.btn-delete').addEventListener('click', () => {
         choices = choices.filter(c => c.id !== choice.id);
         if(selectedId === choice.id) selectedId = null;
-        render();
+        render(); saveData();
       });
 
-      card.querySelector('textarea').addEventListener('input', (e) => {
-        choice.detail = e.target.value;
-      });
+      card.querySelector('.input-tags').addEventListener('input', (e) => { choice.tags = e.target.value; saveData(); });
+      card.querySelector('.input-weight').addEventListener('change', (e) => { choice.weight = Number(e.target.value) || 1; render(); saveData(); });
+      card.querySelector('textarea').addEventListener('input', (e) => { choice.detail = e.target.value; saveData(); });
 
       elements.list.appendChild(card);
     });
+
+    elements.weightBadge.textContent = totalWeight;
+    renderHistory();
   }
 
   function addChoice() {
     const text = elements.input.value.trim();
     if (!text) return;
-    
-    choices.push({ id: generateId(), title: text, detail: '', showDetail: false });
+    choices.push({ id: generateId(), title: text, detail: '', tags: '', weight: 1, showDetail: false });
     elements.input.value = '';
-    
-    // เลื่อนหน้าจอลงไปล่างสุด
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
-    render();
+    render(); saveData();
   }
 
-  function showModal(choice, isRandom = false) {
+  function saveToHistory(title) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit' });
+    decisionHistory.push({ title, date: dateStr });
+    if(decisionHistory.length > 20) decisionHistory.shift(); // เก็บแค่ 20 รายการล่าสุด
+    saveData();
+    renderHistory();
+  }
+
+  function showModal(choice, isRandom = false, type = '') {
     elements.modalTitle.textContent = choice.title;
-    elements.modalSubtitle.textContent = isRandom ? 'ระบบสุ่มให้คุณคือ...' : 'ตัวเลือกที่คุณตัดสินใจ...';
-    elements.modalIcon.textContent = isRandom ? '🎲' : '🎯';
-    
-    if(choice.detail && choice.detail.trim() !== '') {
-      elements.modalDetail.textContent = choice.detail;
-      elements.modalDetail.style.display = 'block';
-    } else {
-      elements.modalDetail.style.display = 'none';
-    }
-    
+    elements.modalSubtitle.textContent = isRandom ? `ระบบสุ่มให้คุณคือ... (${type})` : 'ตัวเลือกที่คุณตัดสินใจ...';
+    elements.modalIcon.textContent = isRandom ? '🎰' : '🎯';
     elements.modal.classList.add('show');
+    saveToHistory(choice.title);
   }
 
-  function startRandomize() {
+  function spinRoulette(weighted = false) {
     if (choices.length === 0 || isSpinning) return;
     if (choices.length === 1) {
-      selectedId = choices[0].id;
-      render();
-      showModal(choices[0], true);
-      return;
+      selectedId = choices[0].id; render(); showModal(choices[0], true, 'ตัวเลือกเดียว'); return;
     }
 
     isSpinning = true;
     elements.randomBtn.disabled = true;
-    
-    // ล้างสถานะเลือกชั่วคราว
-    selectedId = null; 
-    render();
+    elements.randomWeightBtn.disabled = true;
+    selectedId = null; render();
 
     let spins = 0;
-    const maxSpins = Math.floor(Math.random() * 10) + 20; // สุ่มจำนวนรอบ 20-30 รอบ
+    const maxSpins = Math.floor(Math.random() * 10) + 20;
     let currentIndex = 0;
+    let finalTargetIndex = 0;
+
+    // คำนวณเป้าหมายล่วงหน้าถ้าเป็นการสุ่มแบบถ่วงน้ำหนัก
+    if(weighted) {
+      const totalWeight = choices.reduce((sum, c) => sum + (Number(c.weight) || 1), 0);
+      let randomVal = Math.random() * totalWeight;
+      for(let i = 0; i < choices.length; i++) {
+        randomVal -= (Number(choices[i].weight) || 1);
+        if(randomVal <= 0) { finalTargetIndex = i; break; }
+      }
+    } else {
+      finalTargetIndex = Math.floor(Math.random() * choices.length);
+    }
 
     const spinInterval = () => {
-      // เอาไฮไลต์เก่าออก
-      const cards = document.querySelectorAll('.choice-card');
-      cards.forEach(c => c.classList.remove('spinning'));
-
-      // ใส่ไฮไลต์อันใหม่
+      document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('spinning'));
+      
       const activeCard = document.getElementById(`card-${choices[currentIndex].id}`);
       if(activeCard) activeCard.classList.add('spinning');
 
       spins++;
       
-      if (spins < maxSpins) {
+      if (spins < maxSpins || (spins >= maxSpins && currentIndex !== finalTargetIndex)) {
         currentIndex = (currentIndex + 1) % choices.length;
-        // ยิ่งใกล้จบ ยิ่งหน่วงเวลาให้ช้าลง (Roulette effect)
-        const delay = Math.max(50, spins * 10); 
+        const delay = Math.max(50, spins * 12); 
         setTimeout(spinInterval, delay);
       } else {
-        // สิ้นสุดการหมุน
         isSpinning = false;
         elements.randomBtn.disabled = false;
-        selectedId = choices[currentIndex].id;
-        render(); // อัปเดต UI ให้แสดงเป็นตัวที่ถูกเลือกจริงๆ
-        setTimeout(() => showModal(choices[currentIndex], true), 400);
+        elements.randomWeightBtn.disabled = false;
+        selectedId = choices[finalTargetIndex].id;
+        render(); 
+        setTimeout(() => showModal(choices[finalTargetIndex], true, weighted ? 'แบบถ่วงน้ำหนัก' : 'แบบปกติ'), 400);
       }
     };
-
     spinInterval();
   }
 
-  // Events
+  // Event Listeners
   elements.addBtn.addEventListener('click', addChoice);
-  elements.input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addChoice();
-  });
+  elements.input.addEventListener('keypress', (e) => { if (e.key === 'Enter') addChoice(); });
   
   elements.clearBtn.addEventListener('click', () => {
-    if(confirm('คุณแน่ใจหรือไม่ว่าต้องการล้างตัวเลือกทั้งหมด?')) {
-      choices = [];
-      selectedId = null;
-      render();
-    }
+    if(confirm('ล้างตัวเลือกทั้งหมดเลยใช่ไหม?')) { choices = []; selectedId = null; render(); saveData(); }
+  });
+
+  elements.clearHistoryBtn.addEventListener('click', () => {
+    if(confirm('ลบประวัติการตัดสินใจทั้งหมด?')) { decisionHistory = []; renderHistory(); saveData(); }
   });
 
   elements.confirmBtn.addEventListener('click', () => {
@@ -573,13 +535,12 @@
     if(choice) showModal(choice, false);
   });
 
-  elements.randomBtn.addEventListener('click', startRandomize);
-  
+  elements.randomBtn.addEventListener('click', () => spinRoulette(false));
+  elements.randomWeightBtn.addEventListener('click', () => spinRoulette(true));
   elements.closeModalBtn.addEventListener('click', () => elements.modal.classList.remove('show'));
-  
-  // Initial render
-  render();
 
+  // Init
+  render();
 </script>
 </body>
 </html>
